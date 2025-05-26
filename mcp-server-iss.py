@@ -19,11 +19,11 @@ async def make_iss_request(url: str) -> dict[str, Any] | None:
 def format_response(json: dict) -> str:
     """Format an json into a readable string."""
     return f"""
-Timestamp: {json.get('timestamp')}
-Message: {json.get('message')}
-Latitude: {json.get('iss_position').get('latitude')}
-Longitude: {json.get('iss_position').get('longitude')}
-"""
+        Timestamp: {json.get('timestamp')}
+        Message: {json.get('message')}
+        Latitude: {json.get('iss_position').get('latitude')}
+        Longitude: {json.get('iss_position').get('longitude')}
+        """
 
 @mcp.tool()
 async def get_position() -> str:
@@ -41,9 +41,8 @@ async def get_position() -> str:
     if not data["message"]:
         return "Malformed response"
 
-    return format_response(data)
+    return data
 
 if __name__ == "__main__":
-    # Initialize and run the server
     print("running")
     mcp.run(transport='stdio')
