@@ -9,6 +9,8 @@ from mcp.client.stdio import stdio_client
 from openai import OpenAI
 import json
 
+# uses chat completion api
+
 class MCPClient:
     def __init__(self):
         # Initialize session and client objects
@@ -47,20 +49,18 @@ class MCPClient:
 
     async def send_request(self, messages:list) -> Any:
         response = await self.list_tools()
+        #diff
         available_tools = [{
             "type": "function",
-            "function": {
-                "name": tool.name,
-                "description": tool.description,
-                }
+            "name": tool.name,
+            "description": tool.description
         } for tool in response.tools]
 
         #class 'openai.types.chat.chat_completion.ChatCompletion' 
-        response = self.openai.chat.completions.create(
+        response = self.openai.responses.create(
             model="gpt-4o-mini",
-            messages=messages,
+            input=messages,
             tools=available_tools,
-            tool_choice="auto"
         )
         print("ChatGPT response:", response.to_dict())
         return response
@@ -74,34 +74,28 @@ class MCPClient:
             }
         ]
         response = await self.send_request(messages)
-        tool_call = response.choices[0].message.tool_calls[0]
+        tool_call = response.output[0]
 
         # check for tool calls
-        if response.choices[0].finish_reason == "tool_calls":
+        if tool_call.type == "function_call":
             # append chatgpt tool call
             # tool_call = list
-            messages.append(response.choices[0].message)
-            '''
-            messages.append({
-                "role": "assistant",
-                "content": json.dumps(tool_call.to_dict())
-            })
-            '''
+            messages.append(tool_call)
             
-            tool_name = response.choices[0].message.tool_calls[0].function.name 
+            tool_name = tool_call.name 
             tool_result = await self.call_tool(tool_name)
             coordinate = tool_result.content[0].text
             print("Tool results:", coordinate)   
 
             messages.append({
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": coordinate
+                "type": "function_call_output",
+                "call_id": tool_call.call_id,
+                "output": coordinate
             })         
 
             print("Messages:", messages)
             response = await self.send_request(messages)
-            print("ChatGPT answer:", response.choices[0].message.content)
+            print("ChatGPT answer:", response.output_text)
 
 
 async def main():
@@ -112,6 +106,7 @@ async def main():
     client = MCPClient()
     try:
         await client.connect_to_server()
+        await client.list_tools()
         await client.process_query("What's the current geolocation of the ISS and what city is closest to that position? Don't add formatting to the coordinates")
         #await client.chat_loop()
     finally:
