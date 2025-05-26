@@ -9,8 +9,7 @@ from mcp.client.stdio import stdio_client
 from openai import OpenAI
 import json
 
-# uses chat completion 
-
+# uses chat completions api 
 class MCPClient:
     def __init__(self):
         # Initialize session and client objects
