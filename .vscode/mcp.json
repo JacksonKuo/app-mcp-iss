@@ -1,0 +1,15 @@
+
+{
+    "servers": {
+        "app-mcp-iss": {
+            "type": "stdio",
+            "env": {
+                "PYTHONPATH":"/Users/jacksonkuo/workspace/app-mcp-iss/.venv/lib/python3.13/site-packages:$PYTHONPATH"
+            },
+            "command": "python3",
+            "args": [
+                "/Users/jacksonkuo/workspace/app-mcp-iss/mcp-server-iss.py"
+            ]
+        }
+    }
+}

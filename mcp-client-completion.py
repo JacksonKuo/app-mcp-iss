@@ -8,6 +8,7 @@ from mcp.client.stdio import stdio_client
 
 from openai import OpenAI
 import json
+import os
 
 # uses chat completions api 
 class MCPClient:
@@ -108,6 +109,10 @@ class MCPClient:
 async def main():
     if len(sys.argv) < 1:
         print("Usage: python client.py")
+        sys.exit(1)
+
+    if not os.environ['OPENAI_API_KEY']:
+        print("Missing OpenAI API key")
         sys.exit(1)
 
     client = MCPClient()
